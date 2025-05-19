@@ -1,0 +1,10 @@
+# .NET Core
+bin/
+obj/
+*.user
+*.userosscache
+*.suo
+*.dbmdl
+*.jfm
+*.pfx
+*.publishsettings
