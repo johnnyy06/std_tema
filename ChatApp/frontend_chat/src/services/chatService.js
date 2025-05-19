@@ -2,7 +2,7 @@ import * as signalR from '@microsoft/signalr';
 import axios from 'axios';
 
 // URL-ul API-ului backend
-const API_URL = 'https://localhost:5001';
+const API_URL = 'https://localhost:7009';
 const HUB_URL = `${API_URL}/chatHub`;
 
 let connection = null;
