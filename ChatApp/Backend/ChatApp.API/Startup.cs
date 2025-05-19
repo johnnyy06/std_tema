@@ -62,14 +62,28 @@ namespace ChatApp.API
             // Inițializare bază de date
             using (var scope = app.Services.CreateScope())
             {
-                var services = scope.ServiceProvider;
-                var context = services.GetRequiredService<ApplicationDbContext>();
+                try
+                {
+                    var services = scope.ServiceProvider;
+                    var context = services.GetRequiredService<ApplicationDbContext>();
 
-                // Asigură-te că baza de date este creată
-                context.Database.EnsureCreated();
+                    // Asigură-te că baza de date este creată
+                    context.Database.EnsureCreated();
 
-                // Inițializează baza de date cu date de test dacă este nevoie
-                DbInitializer.Initialize(context);
+                    // Inițializează baza de date cu date de test dacă este nevoie
+                    DbInitializer.Initialize(context);
+
+                    Console.WriteLine("Baza de date inițializată cu succes.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Eroare la inițializarea bazei de date: {ex.Message}");
+                    // În mediul de dezvoltare, poate ajuta să vedem stack trace-ul complet
+                    if (env.IsDevelopment())
+                    {
+                        Console.WriteLine(ex.ToString());
+                    }
+                }
             }
 
             app.UseHttpsRedirection();
