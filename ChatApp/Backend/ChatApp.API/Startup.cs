@@ -26,17 +26,22 @@ namespace ChatApp.API
                 options.AddPolicy("CorsPolicy", builder =>
                 {
                     builder
-                        .WithOrigins("http://localhost:8080") // URL-ul frontend-ului
+                        .AllowAnyOrigin()
                         .AllowAnyMethod()
                         .AllowAnyHeader()
+                        .SetIsOriginAllowed(_ => true)
                         .AllowCredentials();
                 });
             });
 
             // Configurare bază de date MySQL
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            if (Environment.GetEnvironmentVariable("KUBERNETES_SERVICE_HOST") != null)
+            {
+                connectionString = "Server=mysql-service;Database=chatdb;Uid=chatuser;Pwd=ChatP@ssw0rd;";
+            }
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
             // Configurare SignalR pentru WebSocket
             services.AddSignalR();
