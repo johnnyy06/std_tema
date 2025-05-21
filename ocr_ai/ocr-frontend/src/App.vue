@@ -1,114 +1,95 @@
 <template>
-  <div class="ocr-container">
-    <h2>OCR Document Processing</h2>
-    
-    <div class="upload-section">
-      <input type="file" @change="onFileSelected" accept="image/jpeg,image/png,application/pdf" />
-      <button @click="uploadFile" :disabled="!selectedFile || processing">Upload & Process</button>
-    </div>
-    
-    <div v-if="processing" class="processing">
-      <p>Processing your document...</p>
-    </div>
-    
-    <div v-if="error" class="error">
-      <p>{{ error }}</p>
-    </div>
-    
-    <div v-if="results" class="results">
-      <h3>Extracted Text:</h3>
-      <pre>{{ results }}</pre>
-    </div>
-    
-    <div class="history" v-if="history.length > 0">
-      <h3>Processing History</h3>
-      <ul>
-        <li v-for="(item, index) in history" :key="index">
-          <div>
-            <strong>{{ item.Filename }}</strong> - {{ formatDate(item.Timestamp) }}
-            <button @click="viewResult(item)">View Result</button>
-          </div>
-        </li>
-      </ul>
-    </div>
+  <div id="app">
+    <header>
+      <h1>Document OCR Processing</h1>
+    </header>
+    <main>
+      <OcrProcessor />
+    </main>
+    <footer>
+      <p>&copy; 2025 - OCR Document Processing Application</p>
+    </footer>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import OcrProcessor from './components/OcrProcessor.vue'
 
 export default {
-  name: 'OcrProcessor',
-  data() {
-    return {
-      selectedFile: null,
-      processing: false,
-      results: null,
-      error: null,
-      history: []
-    }
-  },
-  mounted() {
-    this.loadHistory();
-  },
-  methods: {
-    onFileSelected(event) {
-      this.selectedFile = event.target.files[0];
-      this.error = null;
-      this.results = null;
-    },
-    
-    async uploadFile() {
-      if (!this.selectedFile) return;
-      
-      this.processing = true;
-      this.error = null;
-      
-      const formData = new FormData();
-      formData.append('file', this.selectedFile);
-      
-      try {
-        // Trimite fișierul la backend pentru procesare
-        const response = await axios.post('http://localhost:3000/api/ocr/process', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-        
-        this.results = response.data.text;
-        this.loadHistory(); // Reîncarcă istoricul după procesare
-      } catch (err) {
-        this.error = 'Error processing document: ' + (err.response?.data?.message || err.message);
-      } finally {
-        this.processing = false;
-      }
-    },
-    
-    async loadHistory() {
-      try {
-        const response = await axios.get('http://ocr-backend-service/api/ocr/history');
-        this.history = response.data;
-      } catch (err) {
-        console.error('Failed to load history:', err);
-      }
-    },
-    
-    async viewResult(item) {
-      try {
-        const response = await axios.get(`http://ocr-backend-service/api/ocr/result/${item.Id}`);
-        this.results = response.data.text;
-      } catch (err) {
-        this.error = 'Error loading result: ' + err.message;
-      }
-    },
-    
-    formatDate(timestamp) {
-      return new Date(timestamp).toLocaleString();
-    }
+  name: 'App',
+  components: {
+    OcrProcessor
   }
 }
 </script>
 
-<style scoped>
-/* Stilurile sunt la fel ca în exemplul anterior */
+<style>
+:root {
+  --primary-color: #4285f4;
+  --primary-dark: #3367d6;
+  --text-color: #333;
+  --light-gray: #f5f5f5;
+  --medium-gray: #ddd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--light-gray);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+#app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+h1 {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+footer {
+  text-align: center;
+  margin-top: 30px;
+  color: #666;
+  font-size: 0.9em;
+  padding: 20px 0;
+  border-top: 1px solid var(--medium-gray);
+}
+
+main {
+  min-height: 70vh;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus, input:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  #app {
+    padding: 10px;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+}
 </style>

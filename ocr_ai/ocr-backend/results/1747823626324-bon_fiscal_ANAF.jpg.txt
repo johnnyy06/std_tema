@@ -1,0 +1,10 @@
+Sample OCR text from bon_fiscal_ANAF.jpg
+
+This is a simulated OCR text for development purposes.
+The actual text would be extracted from the document using Azure Document Intelligence API.
+
+File details:
+- Name: bon_fiscal_ANAF.jpg
+- Size: 108254 bytes
+- Type: image/jpeg
+- Saved to: /home/johnnyy/Documents/tema_std/ocr_ai/ocr-backend/uploads/1747823626324-bon_fiscal_ANAF.jpg
