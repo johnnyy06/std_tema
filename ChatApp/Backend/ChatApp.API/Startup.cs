@@ -26,7 +26,7 @@ namespace ChatApp.API
                 options.AddPolicy("CorsPolicy", builder =>
                 {
                     builder
-                        .WithOrigins("http://localhost:8080")
+                        .WithOrigins("http://localhost:8080") // URL-ul frontend-ului
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials();
