@@ -1,0 +1,258 @@
+# Master deployment file for all services
+# MySQL Components
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /tmp/mysql-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "rootpassword"
+        - name: MYSQL_DATABASE
+          value: "chatdb"
+        - name: MYSQL_USER
+          value: "chatuser"
+        - name: MYSQL_PASSWORD
+          value: "ChatP@ssw0rd"
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: ClusterIP
+---
+# ChatApp Backend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatapp-backend-deployment
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: chatapp-backend
+  template:
+    metadata:
+      labels:
+        app: chatapp-backend
+    spec:
+      containers:
+      - name: chatapp-backend
+        image: johnnyy06/chatapp-backend:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        - name: ASPNETCORE_URLS
+          value: "http://+:80"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatapp-backend-service
+spec:
+  selector:
+    app: chatapp-backend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 88
+      targetPort: 80
+  type: NodePort
+---
+# ChatApp Frontend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatapp-frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatapp-frontend
+  template:
+    metadata:
+      labels:
+        app: chatapp-frontend
+    spec:
+      containers:
+      - name: chatapp-frontend
+        image: johnnyy06/chatapp-frontend:latest
+        ports:
+        - containerPort: 90
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatapp-frontend-service
+spec:
+  selector:
+    app: chatapp-frontend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 90
+      targetPort: 90
+  type: NodePort
+---
+# OCR Backend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ocr-backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ocr-backend
+  template:
+    metadata:
+      labels:
+        app: ocr-backend
+    spec:
+      containers:
+      - name: ocr-backend
+        image: johnnyy06/ocr-backend:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: PORT
+          value: "3000"
+        - name: NODE_ENV
+          value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocr-backend-service
+spec:
+  selector:
+    app: ocr-backend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+  type: NodePort
+---
+# OCR Frontend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ocr-frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ocr-frontend
+  template:
+    metadata:
+      labels:
+        app: ocr-frontend
+    spec:
+      containers:
+      - name: ocr-frontend
+        image: johnnyy06/ocr-frontend:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocr-frontend-service
+spec:
+  selector:
+    app: ocr-frontend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
+---
+# Simple Site
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-site-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: simple-site
+  template:
+    metadata:
+      labels:
+        app: simple-site
+    spec:
+      containers:
+      - name: simple-site
+        image: johnnyy06/simple-site:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simple-site-service
+spec:
+  selector:
+    app: simple-site
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort

@@ -1,0 +1,14 @@
+# ChatApp Backend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatapp-backend-service
+spec:
+  selector:
+    app: chatapp-backend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 88  # Expus pe portul 88 conform cerințelor
+      targetPort: 80
+  type: NodePort

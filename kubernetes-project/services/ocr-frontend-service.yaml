@@ -1,0 +1,14 @@
+# OCR Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocr-frontend-service
+spec:
+  selector:
+    app: ocr-frontend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort

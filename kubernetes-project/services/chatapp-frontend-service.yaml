@@ -1,0 +1,14 @@
+# ChatApp Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatapp-frontend-service
+spec:
+  selector:
+    app: chatapp-frontend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 90  # Expus pe portul 90 conform cerințelor
+      targetPort: 90
+  type: NodePort

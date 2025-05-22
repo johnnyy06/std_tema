@@ -1,0 +1,20 @@
+# OCR Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ocr-frontend-deployment
+spec:
+  replicas: 1  # Conform cerințelor: 1 replică
+  selector:
+    matchLabels:
+      app: ocr-frontend
+  template:
+    metadata:
+      labels:
+        app: ocr-frontend
+    spec:
+      containers:
+      - name: ocr-frontend
+        image: johnnyy06/ocr-frontend:latest
+        ports:
+        - containerPort: 80
