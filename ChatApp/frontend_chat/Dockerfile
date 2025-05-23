@@ -6,9 +6,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Create a .env file with correct service URLs
-RUN echo "VUE_APP_API_BASE_URL=http://backend:88" > .env
-RUN echo "VUE_APP_HUB_URL=http://backend:88/chatHub" >> .env
+# Create a .env file with correct service URLs for Kubernetes
+RUN echo "VUE_APP_API_BASE_URL=http://chatapp-backend-service:88" > .env
+RUN echo "VUE_APP_HUB_URL=http://chatapp-backend-service:88/chatHub" >> .env
 
 # Copy the rest of the code and build the app
 COPY . .

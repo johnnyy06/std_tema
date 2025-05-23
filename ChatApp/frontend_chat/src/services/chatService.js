@@ -1,8 +1,10 @@
 import * as signalR from '@microsoft/signalr';
 import axios from 'axios';
 
-// URL-ul API-ului backend
-const API_URL = 'http://localhost:7009';
+// Pentru Kubernetes - folosește adresa externă NodePort
+// Înlocuiește YOUR_NODE_IP cu IP-ul real al nodului Kubernetes
+const NODE_IP = 'YOUR_NODE_IP'; // ex: '192.168.1.100' sau 'localhost' dacă rulezi local
+const API_URL = `http://${NODE_IP}:30088`; // NodePort pentru backend
 const HUB_URL = `${API_URL}/chatHub`;
 
 let connection = null;
@@ -10,16 +12,24 @@ let connection = null;
 const startConnection = async () => {
     if (connection) return;
 
+    console.log('Connecting to SignalR Hub at:', HUB_URL);
+
     connection = new signalR.HubConnectionBuilder()
-        .withUrl(HUB_URL)
+        .withUrl(HUB_URL, {
+            withCredentials: false,
+            skipNegotiation: false,
+            transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.LongPolling
+        })
         .withAutomaticReconnect()
+        .configureLogging(signalR.LogLevel.Debug)
         .build();
 
     try {
         await connection.start();
-        console.log('SignalR Connected.');
+        console.log('SignalR Connected successfully to:', HUB_URL);
     } catch (err) {
         console.error('Error while connecting to SignalR Hub: ', err);
+        console.log('Retrying connection in 5 seconds...');
         setTimeout(startConnection, 5000);
     }
 };
@@ -44,6 +54,7 @@ const getMessages = () => {
 
 const getMessagesHttp = async () => {
     try {
+        console.log('Fetching messages via HTTP from:', `${API_URL}/api/chat`);
         const response = await axios.get(`${API_URL}/api/chat`);
         return response.data;
     } catch (error) {

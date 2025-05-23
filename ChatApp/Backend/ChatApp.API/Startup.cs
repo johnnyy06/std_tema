@@ -20,7 +20,7 @@ namespace ChatApp.API
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
-            // Configurare CORS pentru a permite cereri de la frontend
+            // Enhanced CORS configuration for Kubernetes
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", builder =>
@@ -28,25 +28,39 @@ namespace ChatApp.API
                     builder
                         .AllowAnyOrigin()
                         .AllowAnyMethod()
-                        .AllowAnyHeader()
+                        .AllowAnyHeader();
+                });
+
+                options.AddPolicy("SignalRCorsPolicy", builder =>
+                {
+                    builder
                         .SetIsOriginAllowed(_ => true)
-                        .AllowCredentials();
+                        .AllowCredentials()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
                 });
             });
 
-            // Configurare bază de date MySQL
+            // Configure database connection string
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             if (Environment.GetEnvironmentVariable("KUBERNETES_SERVICE_HOST") != null)
             {
                 connectionString = "Server=mysql-service;Database=chatdb;Uid=chatuser;Pwd=ChatP@ssw0rd;";
             }
+
             services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-            // Configurare SignalR pentru WebSocket
-            services.AddSignalR();
+            // Enhanced SignalR configuration
+            services.AddSignalR(options =>
+            {
+                options.EnableDetailedErrors = true;
+                options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+                options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+                options.HandshakeTimeout = TimeSpan.FromSeconds(15);
+            });
 
-            // Injectare dependențe pentru servicii
+            // Dependency injection
             services.AddScoped<ChatService>();
         }
 
@@ -61,10 +75,9 @@ namespace ChatApp.API
             else
             {
                 app.UseExceptionHandler("/Error");
-                app.UseHsts();
             }
 
-            // Inițializare bază de date
+            // Database initialization
             using (var scope = app.Services.CreateScope())
             {
                 try
@@ -72,18 +85,14 @@ namespace ChatApp.API
                     var services = scope.ServiceProvider;
                     var context = services.GetRequiredService<ApplicationDbContext>();
 
-                    // Asigură-te că baza de date este creată
                     context.Database.EnsureCreated();
-
-                    // Inițializează baza de date cu date de test dacă este nevoie
                     DbInitializer.Initialize(context);
 
-                    Console.WriteLine("Baza de date inițializată cu succes.");
+                    Console.WriteLine("Database initialized successfully.");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Eroare la inițializarea bazei de date: {ex.Message}");
-                    // În mediul de dezvoltare, poate ajuta să vedem stack trace-ul complet
+                    Console.WriteLine($"Database initialization error: {ex.Message}");
                     if (env.IsDevelopment())
                     {
                         Console.WriteLine(ex.ToString());
@@ -91,13 +100,22 @@ namespace ChatApp.API
                 }
             }
 
-            app.UseHttpsRedirection();
+            // Configure middleware pipeline
             app.UseRouting();
+
+            // Apply CORS before other middleware
             app.UseCors("CorsPolicy");
+
             app.UseAuthorization();
 
+            // Map endpoints
             app.MapControllers();
-            app.MapHub<ChatHub>("/chatHub");
+
+            // Apply SignalR specific CORS policy
+            app.MapHub<ChatHub>("/chatHub").RequireCors("SignalRCorsPolicy");
+
+            // Add health check endpoint
+            app.MapGet("/health", () => "Healthy");
         }
     }
 }
