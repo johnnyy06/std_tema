@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ocr-backend
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ocr-backend
+  template:
+    metadata:
+      labels:
+        app: ocr-backend
+    spec:
+      containers:
+      - name: ocr-backend
+        image: johnnyy06/ocr-backend:latest
+        ports:
+          - containerPort: 3001
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3001"
+        # Azure environment variables from secrets
+        - name: AZURE_STORAGE_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: azure-secrets
+              key: storage-connection-string
+        - name: BLOB_CONTAINER_NAME
+          value: "filestor34"
+        - name: OCR_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: azure-secrets
+              key: ocr-endpoint
+        - name: OCR_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure-secrets
+              key: ocr-key
+        - name: SQL_SERVER
+          valueFrom:
+            secretKeyRef:
+              name: azure-secrets
+              key: sql-server
+        - name: SQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: azure-secrets
+              key: sql-database
+        - name: SQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: azure-secrets
+              key: sql-user
+        - name: SQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: azure-secrets
+              key: sql-password
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"

@@ -3,7 +3,6 @@ const multer = require('multer');
 const { BlobServiceClient } = require('@azure/storage-blob');
 const { DocumentAnalysisClient, AzureKeyCredential } = require('@azure/ai-form-recognizer');
 const sql = require('mssql');
-const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 
@@ -11,7 +10,7 @@ const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3002;
 
 // Validate required environment variables
 const requiredEnvVars = [
@@ -65,13 +64,13 @@ process.on('unhandledRejection', (error) => {
     console.error('Unhandled Rejection:', error);
 });
 
-// CORS configuration
-app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:8080',
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-}));
+// // CORS configuration
+// app.use(cors({
+//     origin: process.env.FRONTEND_URL || 'http://localhost:8080',
+//     methods: ['GET', 'POST', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     credentials: true
+// }));
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -484,7 +483,7 @@ async function startServer() {
 
         app.listen(port, () => {
             console.log(`OCR API Server running on port ${port} in ${process.env.NODE_ENV || 'development'} mode`);
-            console.log(`CORS enabled for ${process.env.FRONTEND_URL || 'http://localhost:8080'}`);
+            //console.log(`CORS enabled for ${process.env.FRONTEND_URL || 'http://localhost:8080'}`);
             console.log(`Using Azure Blob Storage: ${useAzureStorage}`);
             console.log(`Using Azure OCR: ${useAzureOcr}`);
             console.log(`Using SQL Database: ${useSqlDatabase}`);

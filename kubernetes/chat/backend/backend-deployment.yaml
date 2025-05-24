@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatapp-backend-deployment
+  labels:
+    app: chatapp-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatapp-backend
+  template:
+    metadata:
+      labels:
+        app: chatapp-backend
+    spec:
+      containers:
+      - name: chatapp-backend
+        image: johnnyy06/chatapp-backend:latest
+        ports:
+        - containerPort: 88
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        - name: ConnectionStrings__DefaultConnection
+          value: "Server=mysql-service;Database=chatdb;Uid=chatuser;Pwd=ChatP@ssw0rd;"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 88
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 88
+          initialDelaySeconds: 5
+          periodSeconds: 5

@@ -1,10 +1,21 @@
 import * as signalR from '@microsoft/signalr';
 import axios from 'axios';
 
-// Pentru Kubernetes - folosește adresa externă NodePort
-// Înlocuiește YOUR_NODE_IP cu IP-ul real al nodului Kubernetes
-const NODE_IP = 'YOUR_NODE_IP'; // ex: '192.168.1.100' sau 'localhost' dacă rulezi local
-const API_URL = `http://${NODE_IP}:30088`; // NodePort pentru backend
+// Detectare automată pentru Kubernetes sau dezvoltare locală
+const getApiUrl = () => {
+    const currentHost = window.location.hostname;
+
+    // Verifică dacă suntem în Kubernetes (nu localhost)
+    if (currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
+        // Folosește IP-ul nodului și NodePort pentru backend
+        return `http://${currentHost}:30088`;
+    } else {
+        // Dezvoltare locală
+        return 'http://localhost:7009';
+    }
+};
+
+const API_URL = getApiUrl();
 const HUB_URL = `${API_URL}/chatHub`;
 
 let connection = null;
@@ -20,13 +31,29 @@ const startConnection = async () => {
             skipNegotiation: false,
             transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.LongPolling
         })
-        .withAutomaticReconnect()
-        .configureLogging(signalR.LogLevel.Debug)
+        .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
+        .configureLogging(signalR.LogLevel.Information)
         .build();
+
+    // Handle connection events
+    connection.onreconnecting((error) => {
+        console.log('SignalR reconnecting...', error);
+    });
+
+    connection.onreconnected((connectionId) => {
+        console.log('SignalR reconnected with ID:', connectionId);
+    });
+
+    connection.onclose((error) => {
+        console.log('SignalR connection closed', error);
+        // Retry connection after 5 seconds
+        setTimeout(startConnection, 5000);
+    });
 
     try {
         await connection.start();
         console.log('SignalR Connected successfully to:', HUB_URL);
+        console.log('Connection ID:', connection.connectionId);
     } catch (err) {
         console.error('Error while connecting to SignalR Hub: ', err);
         console.log('Retrying connection in 5 seconds...');
@@ -40,6 +67,8 @@ const sendMessage = (username, message) => {
             .catch(err => console.error('Error sending message: ', err));
     } else {
         console.error('Connection not established. Cannot send message.');
+        // Try to reconnect
+        startConnection();
     }
 };
 
@@ -65,6 +94,7 @@ const getMessagesHttp = async () => {
 
 const onReceiveMessage = (callback) => {
     if (connection) {
+        connection.off('ReceiveMessage'); // Remove previous handlers
         connection.on('ReceiveMessage', (message) => {
             callback(message);
         });
@@ -73,6 +103,7 @@ const onReceiveMessage = (callback) => {
 
 const onReceiveMessages = (callback) => {
     if (connection) {
+        connection.off('ReceiveMessages'); // Remove previous handlers
         connection.on('ReceiveMessages', (messages) => {
             callback(messages);
         });
@@ -81,6 +112,7 @@ const onReceiveMessages = (callback) => {
 
 const onReceiveError = (callback) => {
     if (connection) {
+        connection.off('ReceiveError'); // Remove previous handlers
         connection.on('ReceiveError', (errorMessage) => {
             callback(errorMessage);
         });
@@ -94,5 +126,6 @@ export default {
     getMessagesHttp,
     onReceiveMessage,
     onReceiveMessages,
-    onReceiveError
+    onReceiveError,
+    getApiUrl // Export pentru debugging
 };

@@ -1,21 +1,31 @@
-FROM node:18-alpine
-
+# Build stage
+FROM node:22 AS builder
 WORKDIR /app
 
-# Copy package.json and install dependencies
+# Copiem package files
 COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the code
+# Copiem cod sursă
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p uploads results
+FROM nginx:alpine
 
-ENV PORT=3001
+# Copiem aplicația Node.js
+COPY --from=builder /app /app
 
-# Expose the port
+# Copiem configurația nginx
+COPY nginx.conf /etc/nginx/sites-available/default
+
+# Creăm directoarele necesare
+RUN mkdir -p /run/nginx /app/uploads /app/results
+
+WORKDIR /app
+
+# Setări de mediu
+ENV PORT=3002
+ENV NODE_ENV=production
+
 EXPOSE 3001
 
-# Environment variables will be injected by Kubernetes
-CMD ["npm", "start"]
+CMD ["sh", "-c", "nginx & node server.js"]

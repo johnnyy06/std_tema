@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatapp-frontend-service
+spec:
+  selector:
+    app: chatapp-frontend
+  ports:
+  - port: 90
+    targetPort: 90
+    nodePort: 30090
+  type: NodePort

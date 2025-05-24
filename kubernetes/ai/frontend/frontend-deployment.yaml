@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chatapp-frontend-deployment
+  name: ocr-frontend-deployment
   labels:
-    app: chatapp-frontend
+    app: ocr-frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: chatapp-frontend
+      app: ocr-frontend
   template:
     metadata:
       labels:
-        app: chatapp-frontend
+        app: ocr-frontend
     spec:
       containers:
-      - name: chatapp-frontend
-        image: johnnyy06/chatapp-frontend:latest
+      - name: ocr-frontend
+        image: johnnyy06/ocr-frontend:latest
         ports:
-        - containerPort: 90
+        - containerPort: 80
         resources:
           requests:
             memory: "128Mi"
@@ -29,6 +29,6 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 90
+            port: 80
           initialDelaySeconds: 30
           periodSeconds: 10
