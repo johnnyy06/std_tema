@@ -1,4 +1,5 @@
 FROM node:18-alpine
+
 WORKDIR /app
 
 # Copy package.json and install dependencies
@@ -11,8 +12,10 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p uploads results
 
+ENV PORT=3001
+
 # Expose the port
-EXPOSE 3000
+EXPOSE 3001
 
 # Environment variables will be injected by Kubernetes
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
