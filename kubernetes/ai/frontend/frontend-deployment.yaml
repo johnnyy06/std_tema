@@ -16,16 +16,9 @@ spec:
     spec:
       containers:
       - name: ocr-frontend
-        image: johnnyy06/ocr-frontend:latest
+        image: johnnyy06/ocr-frontend:v1.5
         ports:
         - containerPort: 80
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "200m"
         livenessProbe:
           httpGet:
             path: /health

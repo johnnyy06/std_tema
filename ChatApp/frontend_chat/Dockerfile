@@ -1,30 +1,24 @@
-# Build stage
-FROM node:18-alpine AS build
+FROM nginx:alpine
 WORKDIR /app
+
+# Install Node.js
+RUN apk add --no-cache nodejs npm
 
 # Copy package.json and install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Create a .env file with correct service URLs for Kubernetes
-RUN echo "VUE_APP_API_BASE_URL=http://chatapp-backend-service:88" > .env
-RUN echo "VUE_APP_HUB_URL=http://chatapp-backend-service:88/chatHub" >> .env
-
 # Copy the rest of the code and build the app
 COPY . .
 RUN npm run build
 
-# Production stage with Nginx
-FROM nginx:alpine
-WORKDIR /usr/share/nginx/html
+# Move built app to Nginx serve directory
+RUN mv /app/dist/* /usr/share/nginx/html/
 
-# Copy the built app from the build stage
-COPY --from=build /app/dist .
-
-# Copy nginx configuration to expose on port 90
+# Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port 90 as specified in the requirements
+# Expose port 90 as specified
 EXPOSE 90
 
 CMD ["nginx", "-g", "daemon off;"]

@@ -1,27 +1,27 @@
-# Build stage
-FROM node:18-alpine AS build
+FROM alpine:latest
+
+# Install Node.js, npm, and Nginx
+RUN apk add --no-cache nodejs npm nginx
+
 WORKDIR /app
 
-# Copy package.json and install dependencies
+# Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Create a .env file with correct API URL
-RUN echo "VUE_APP_API_BASE_URL=http://ocr-backend:3001/api" > .env
-
-# Copy the rest of the code and build the app
+# Copy the rest of the app and build
 COPY . .
 RUN npm run build
 
-# Production stage with Nginx
-FROM nginx:alpine
-WORKDIR /usr/share/nginx/html
+# Copy the built app to Nginx's html directory
+RUN mkdir -p /usr/share/nginx/html && \
+    cp -r dist/* /usr/share/nginx/html/
 
-# Copy the built app from the build stage
-COPY --from=build /app/dist .
+# Copy the Nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Clean up to reduce image size
+RUN rm -rf /var/cache/apk/* /root/.npm /app/node_modules /app/src /app/public
 
 EXPOSE 80
 

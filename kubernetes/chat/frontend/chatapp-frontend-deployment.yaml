@@ -16,16 +16,9 @@ spec:
     spec:
       containers:
       - name: chatapp-frontend
-        image: johnnyy06/chatapp-frontend:latest
+        image: johnnyy06/chatapp-frontend:v1.0
         ports:
         - containerPort: 90
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "200m"
         livenessProbe:
           httpGet:
             path: /health

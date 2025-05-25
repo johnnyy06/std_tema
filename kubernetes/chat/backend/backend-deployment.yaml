@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: chatapp-backend
-        image: johnnyy06/chatapp-backend:latest
+        image: johnnyy06/chatapp-backend:v1.0
         ports:
         - containerPort: 88
         env:
@@ -24,13 +24,6 @@ spec:
           value: "Production"
         - name: ConnectionStrings__DefaultConnection
           value: "Server=mysql-service;Database=chatdb;Uid=chatuser;Pwd=ChatP@ssw0rd;"
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
         livenessProbe:
           httpGet:
             path: /health

@@ -116,10 +116,10 @@ export default {
       // Detectează dacă suntem în Kubernetes
       if (currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
         // Port NodePort pentru OCR backend din kubectl get services (31991)
-        this.apiUrl = `http://${currentHost}:31991/api`;
+        this.apiUrl = process.env.VUE_APP_API_BASE_URL ;
       } else {
         // Fallback pentru dezvoltare locală
-        this.apiUrl = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3001/api';
+        this.apiUrl = process.env.VUE_APP_API_BASE_URL ;
       }
       
       console.log('OCR API URL:', this.apiUrl);
