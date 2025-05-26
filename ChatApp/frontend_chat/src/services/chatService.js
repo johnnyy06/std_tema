@@ -1,21 +1,6 @@
 import * as signalR from '@microsoft/signalr';
 import axios from 'axios';
 
-// Detectare automată pentru Kubernetes sau dezvoltare locală
-const getApiUrl = () => {
-    const currentHost = window.location.hostname;
-
-    // Verifică dacă suntem în Kubernetes (nu localhost)
-    if (currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
-        // Folosește IP-ul nodului și NodePort pentru backend
-        return `http://${currentHost}:30088`;
-    } else {
-        // Dezvoltare locală
-        return 'http://localhost:7009';
-    }
-};
-
-//const API_URL = getApiUrl();
 const API_URL = '/';
 const HUB_URL = '/chatHub';
 
@@ -95,7 +80,7 @@ const getMessagesHttp = async () => {
 
 const onReceiveMessage = (callback) => {
     if (connection) {
-        connection.off('ReceiveMessage'); // Remove previous handlers
+        connection.off('ReceiveMessage');
         connection.on('ReceiveMessage', (message) => {
             callback(message);
         });
@@ -104,7 +89,7 @@ const onReceiveMessage = (callback) => {
 
 const onReceiveMessages = (callback) => {
     if (connection) {
-        connection.off('ReceiveMessages'); // Remove previous handlers
+        connection.off('ReceiveMessages');
         connection.on('ReceiveMessages', (messages) => {
             callback(messages);
         });
@@ -113,7 +98,7 @@ const onReceiveMessages = (callback) => {
 
 const onReceiveError = (callback) => {
     if (connection) {
-        connection.off('ReceiveError'); // Remove previous handlers
+        connection.off('ReceiveError');
         connection.on('ReceiveError', (errorMessage) => {
             callback(errorMessage);
         });
@@ -128,5 +113,4 @@ export default {
     onReceiveMessage,
     onReceiveMessages,
     onReceiveError,
-    getApiUrl // Export pentru debugging
 };
