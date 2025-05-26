@@ -113,9 +113,6 @@ namespace ChatApp.API
 
             // Apply SignalR specific CORS policy
             app.MapHub<ChatHub>("/chatHub").RequireCors("SignalRCorsPolicy");
-
-            // Add health check endpoint
-            app.MapGet("/health", () => "Healthy");
         }
     }
 }
