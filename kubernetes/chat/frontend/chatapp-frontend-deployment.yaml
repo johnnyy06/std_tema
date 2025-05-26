@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: chatapp-frontend
-        image: johnnyy06/chatapp-frontend:v1.2
+        image: johnnyy06/chatapp-frontend:v1.3
         ports:
         - containerPort: 90
         livenessProbe:
