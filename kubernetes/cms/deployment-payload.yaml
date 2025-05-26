@@ -5,7 +5,7 @@ metadata:
   labels:
     app: payload
 spec:
-  replicas: 4
+  replicas: 1
   selector:
     matchLabels:
       app: payload
@@ -16,54 +16,44 @@ spec:
     spec:
       containers:
         - name: payload
-          image: johnnyy06/payload:latest
+          image: johnnyy06/payload:v1.0
           ports:
             - containerPort: 80
-          lifecycle:
-            postStart:
-              exec:
-                command:
-                  [
-                    "/bin/sh",
-                    "-c",
-                    "mkdir -p /var/www/html/tmp/regularlabs/custom_php && chown -R www-data:www-data /var/www/html/tmp && chmod -R 755 /var/www/html/tmp",
-                  ]
           env:
+            # Environment variables for your frontend apps
             - name: VUE_CHAT_FRONTEND_URL
               valueFrom:
                 configMapKeyRef:
                   name: payload-config
                   key: VUE_CHAT_FRONTEND_URL
-
             - name: VUE_AI_FRONTEND_URL
               valueFrom:
                 configMapKeyRef:
                   name: payload-config
                   key: VUE_AI_FRONTEND_URL
-
-            - name: PAYLOAD_DB_HOST
+            
+            # Payload v3 specific environment variables
+            - name: PAYLOAD_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: db-credentials
-                  key: MYSQL_DATABASE_HOST
-
-            - name: PAYLOAD_DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: db-credentials
-                  key: MYSQL_PASSWORD
-
-            - name: PAYLOAD_DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: db-credentials
-                  key: MYSQL_USER
-
-            - name: PAYLOAD_DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: db-credentials
-                  key: MYSQL_DATABASE
-
-            - name: PAYLOAD_DB_TYPE
-              value: "mysqli"
+                  name: payload-secrets
+                  key: payload-secret
+            - name: DATABASE_URI
+              value: "file:/app/.payload/payload.db"
+            - name: NODE_ENV
+              value: "production"
+            - name: NEXT_PUBLIC_SERVER_URL
+              value: "http://localhost:80"
+          # Health checks
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5

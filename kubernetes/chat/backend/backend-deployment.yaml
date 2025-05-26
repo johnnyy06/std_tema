@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: chatapp-backend
-        image: johnnyy06/chatapp-backend:v1.0
+        image: johnnyy06/chatapp-backend:v1.2
         ports:
         - containerPort: 88
         env:

@@ -16,8 +16,8 @@ const getApiUrl = () => {
 };
 
 //const API_URL = getApiUrl();
-const API_URL = '/api';
-const HUB_URL = `${API_URL}/chatHub`;
+const API_URL = '/';
+const HUB_URL = '/chatHub';
 
 let connection = null;
 

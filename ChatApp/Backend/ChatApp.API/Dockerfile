@@ -17,7 +17,7 @@ COPY nginx.conf /etc/nginx/sites-available/default
 
 # Move published app to /app
 WORKDIR /app
-#RUN mv /src/app/publish/* .
+RUN cp -r /app/publish/* .
 
 # Configure .NET to listen on port 5000
 ENV ASPNETCORE_URLS=http://+:5000
@@ -27,4 +27,4 @@ ENV ASPNETCORE_ENVIRONMENT=Production
 EXPOSE 88
 
 # Run both services
-CMD bash -c "dotnet ChatApp.API.dll & nginx -g 'daemon off;'"
+CMD ["bash", "-c", "dotnet ChatApp.API.dll & nginx -g 'daemon off;'"]
