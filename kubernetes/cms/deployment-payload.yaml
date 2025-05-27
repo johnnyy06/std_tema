@@ -5,10 +5,15 @@ metadata:
   labels:
     app: payload
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: payload
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -16,44 +21,51 @@ spec:
     spec:
       containers:
         - name: payload
-          image: johnnyy06/payload:v1.0
+          image: johnnyy06/payload:v1.4
           ports:
-            - containerPort: 80
+            - containerPort: 3003
           env:
-            # Environment variables for your frontend apps
+            # URLs for iframes from ConfigMap
             - name: VUE_CHAT_FRONTEND_URL
               valueFrom:
                 configMapKeyRef:
                   name: payload-config
-                  key: VUE_CHAT_FRONTEND_URL
+                  key: vue_chat_frontend
             - name: VUE_AI_FRONTEND_URL
               valueFrom:
                 configMapKeyRef:
                   name: payload-config
-                  key: VUE_AI_FRONTEND_URL
-            
-            # Payload v3 specific environment variables
+                  key: vue_ai_frontend
+            # Payload secret from Kubernetes secret
             - name: PAYLOAD_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: payload-secrets
+                  name: azure-secrets
                   key: payload-secret
+            # Database configuration
             - name: DATABASE_URI
               value: "file:/app/.payload/payload.db"
             - name: NODE_ENV
               value: "production"
             - name: NEXT_PUBLIC_SERVER_URL
-              value: "http://localhost:80"
-          # Health checks
+              value: "http://172.189.152.222:30085"
+            # Disable telemetry in production
+            - name: NEXT_TELEMETRY_DISABLED
+              value: "1"
+            # Set SQLite to read-only mode for safety
+            - name: SQLITE_OPEN_READONLY
+              value: "1"
           livenessProbe:
             httpGet:
-              path: /api/health
-              port: 80
-            initialDelaySeconds: 30
-            periodSeconds: 10
+              path: /
+              port: 3003
+            initialDelaySeconds: 45
+            periodSeconds: 30
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
-              path: /api/health
-              port: 80
-            initialDelaySeconds: 5
-            periodSeconds: 5
+              path: /
+              port: 3003
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3

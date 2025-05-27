@@ -6,153 +6,64 @@ yarn-error.log*
 package-lock.json
 yarn.lock
 
-# Next.js
+# Next.js build output
 .next/
 out/
-
-# Production build
 dist/
 build/
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-.nyc_output
-
-# Grunt intermediate storage
-.grunt
-
-# Bower dependency directory
-bower_components
-
-# node-waf configuration
-.lock-wscript
-
-# Compiled binary addons
-build/Release
-
-# Dependency directories
-jspm_packages/
-
-# TypeScript cache
-*.tsbuildinfo
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
+# Environment files
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# parcel-bundler cache
-.cache
-.parcel-cache
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
 
-# Nuxt.js build / generate output
-.nuxt
+# Git
+.git
+.gitignore
 
-# Gatsby files
-.cache/
-public
+# Documentation
+README.md
+*.md
 
-# Vuepress build output
-.vuepress/dist
+# Testing
+coverage/
+.nyc_output
+jest.config.js
+__tests__
+*.test.js
+*.spec.js
 
-# Serverless directories
-.serverless/
+# TypeScript
+*.tsbuildinfo
+tsconfig.tsbuildinfo
 
-# FuseBox cache
-.fusebox/
-
-# DynamoDB Local files
-.dynamodb/
-
-# TernJS port file
-.tern-port
-
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
-
-# Temporary folders
+# Temporary files
 tmp/
 temp/
+*.tmp
+*.temp
 
 # Logs
-logs
+logs/
 *.log
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Editor directories and files
-.vscode/
-.idea
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# OS generated files
+# OS files
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db
 
-# Docker
-Dockerfile
-.dockerignore
-docker-compose*.yml
-
-# Git
-.git
-.gitignore
-README.md
-
-# Media uploads (if storing locally)
-uploads/
-media/
-
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-
-# Payload v3 specific
+# Payload runtime directories
 .payload/
-payload-types.ts
-
-# Generated files
-src/payload-types.ts

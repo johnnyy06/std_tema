@@ -1,3 +1,4 @@
+// payload-blog/src/app/(frontend)/page.tsx
 import { headers as getHeaders } from 'next/headers.js'
 import Image from 'next/image'
 import { getPayload } from 'payload'
@@ -12,7 +13,11 @@ export default async function HomePage() {
   const payload = await getPayload({ config: payloadConfig })
   const { user } = await payload.auth({ headers })
 
-  // Fetch the first published post - Fixed populate syntax for Payload v3
+  // Get iframe URLs from environment variables
+  const chatUrl = process.env.VUE_CHAT_FRONTEND_URL || 'http://localhost:30090'
+  const aiUrl = process.env.VUE_AI_FRONTEND_URL || 'http://localhost:30098'
+
+  // Fetch the first published post
   const { docs: posts } = await payload.find({
     collection: 'posts',
     where: {
@@ -22,17 +27,10 @@ export default async function HomePage() {
     },
     sort: '-publishedDate',
     limit: 1,
-    depth: 2, // This replaces the populate syntax in v3
+    depth: 2,
   })
 
   const post = posts[0]
-
-  // Debug: Log the post structure (remove this in production)
-  if (post) {
-    console.log('Post structure:', JSON.stringify(post, null, 2))
-    console.log('Content type:', typeof post.content)
-    console.log('Content value:', post.content)
-  }
 
   // Function to render Lexical rich text content
   const renderLexicalNode = (node: any, key: number = 0): React.ReactNode => {
@@ -43,7 +41,6 @@ export default async function HomePage() {
       let text: React.ReactNode = node.text || ''
 
       // Apply formatting based on the format number
-      // format: 1 = bold, 2 = italic, 4 = underline, etc.
       if (node.format & 1) { // Bold
         text = <strong key={key}>{text}</strong>
       }
@@ -97,17 +94,6 @@ export default async function HomePage() {
       )
     }
 
-    // Handle list item nodes
-    if (node.type === 'listitem') {
-      return (
-        <li key={key}>
-          {node.children?.map((child: any, index: number) =>
-            renderLexicalNode(child, index)
-          )}
-        </li>
-      )
-    }
-
     // Handle quote/blockquote nodes
     if (node.type === 'quote') {
       return (
@@ -130,7 +116,6 @@ export default async function HomePage() {
       )
     }
 
-    // Final fallback: return text content if available
     return node.text || null
   }
 
@@ -165,21 +150,6 @@ export default async function HomePage() {
       )
     }
 
-    // If content is an object but not Lexical format
-    if (typeof content === 'object') {
-      return (
-        <pre style={{
-          background: '#f8f9fa',
-          padding: '1rem',
-          borderRadius: '4px',
-          overflow: 'auto',
-          fontSize: '0.9rem'
-        }}>
-          {JSON.stringify(content, null, 2)}
-        </pre>
-      )
-    }
-
     return <p>Content format not recognized</p>
   }
 
@@ -187,6 +157,12 @@ export default async function HomePage() {
     <div className="page-container">
       <div className="home">
         <div className="content">
+          {/* Header Section */}
+          <header className="page-header">
+            <h1>Sisteme Tolerante la Defecte - Demo</h1>
+            <p className="welcome-message">Chat în timp real și procesare OCR cu Kubernetes</p>
+          </header>
+
           {/* Blog Post Section */}
           <section className="blog-section">
             {post ? (
@@ -219,13 +195,13 @@ export default async function HomePage() {
               </article>
             ) : (
               <div className="no-posts">
-                <p>No published posts yet. Create your first post in the admin panel!</p>
-                <p>Make sure to:</p>
+                <p>Welcome to the demo application!</p>
+                <p>This application demonstrates:</p>
                 <ul style={{ textAlign: 'left', marginTop: '1rem' }}>
-                  <li>Create a post with content</li>
-                  <li>Set the status to "published"</li>
-                  <li>Set a published date</li>
-                  <li>Add an author</li>
+                  <li>Real-time chat using WebSockets</li>
+                  <li>OCR document processing with Azure AI</li>
+                  <li>Microservices architecture with Kubernetes</li>
+                  <li>PayloadCMS for content management</li>
                 </ul>
               </div>
             )}
@@ -238,7 +214,7 @@ export default async function HomePage() {
               <div className="app-container">
                 <h3>Real-time Chat</h3>
                 <iframe
-                  src="http://localhost:8080"
+                  src={chatUrl}
                   title="Chat Application"
                   className="app-iframe"
                   allowFullScreen
@@ -248,7 +224,7 @@ export default async function HomePage() {
               <div className="app-container">
                 <h3>OCR Document Processing</h3>
                 <iframe
-                  src="http://localhost:8081"
+                  src={aiUrl}
                   title="OCR Application"
                   className="app-iframe"
                   allowFullScreen
@@ -256,7 +232,9 @@ export default async function HomePage() {
               </div>
             </div>
           </section>
+
           <footer className="page-footer">
+            <p>&copy; 2025 - Tema STD - TATAR IOAN-DAN</p>
           </footer>
         </div>
       </div>

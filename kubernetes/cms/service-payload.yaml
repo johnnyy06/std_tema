@@ -6,7 +6,7 @@ spec:
   selector:
     app: payload
   ports:
-  - port: 8089
-    targetPort: 80
-    nodePort: 30085 
+  - port: 80
+    targetPort: 3003
+    nodePort: 30085
   type: NodePort

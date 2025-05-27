@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: payload-config
 data:
-  VUE_CHAT_FRONTEND_URL: "http://172.189.152.222:30090"
-  VUE_AI_FRONTEND_URL: "http://172.189.152.222:30098"
+  vue_chat_frontend: "http://172.189.152.222:30090"
+  vue_ai_frontend: "http://172.189.152.222:30098"
