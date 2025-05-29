@@ -16,7 +16,7 @@ namespace ChatApp.API.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configurare tabel mesaje
+            // configurare tabel mesaje
             modelBuilder.Entity<ChatMessage>()
                 .HasIndex(m => m.Timestamp);
         }

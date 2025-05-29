@@ -6,7 +6,7 @@ namespace ChatApp.API.Data
     {
         public static void Initialize(ApplicationDbContext context)
         {
-            // Verifică dacă Messages nu este null și dacă nu există deja mesaje
+            // verifica daca Messages nu este null si daca nu exista deja mesaje
             if (context.Messages == null)
             {
                 Console.WriteLine("DbSet Messages este null!");
@@ -21,19 +21,19 @@ namespace ChatApp.API.Data
 
             Console.WriteLine("Se adaugă mesaje inițiale în baza de date...");
 
-            // Adaugă câteva mesaje de test
+            // adauga cateva mesaje de test
             var messages = new ChatMessage[]
             {
         new ChatMessage
         {
             Username = "System",
-            Message = "Bine ați venit în aplicația de chat!",
+            Message = "Bine ati venit in aplicatia de chat!",
             Timestamp = DateTime.UtcNow.AddMinutes(-5)
         },
         new ChatMessage
         {
             Username = "Admin",
-            Message = "Aplicația folosește WebSocket pentru comunicare în timp real.",
+            Message = "Aplicatia folosește WebSocket pentru comunicare in timp real.",
             Timestamp = DateTime.UtcNow.AddMinutes(-4)
         }
             };
@@ -41,7 +41,7 @@ namespace ChatApp.API.Data
             context.Messages.AddRange(messages);
             context.SaveChanges();
 
-            Console.WriteLine("Mesajele inițiale au fost adăugate cu succes.");
+            Console.WriteLine("Mesajele initiale au fost adaugate cu succes.");
         }
     }
 }

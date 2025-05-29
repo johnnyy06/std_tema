@@ -20,7 +20,7 @@ namespace ChatApp.API.Controllers
         {
             try
             {
-                // Verifică conexiunea la baza de date
+                // verifica conexiunea la baza de date
                 await _context.Database.CanConnectAsync();
 
                 return Ok(new

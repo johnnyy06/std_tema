@@ -15,7 +15,7 @@ namespace ChatApp.API.Hubs
 
         public async Task SendMessage(string username, string message)
         {
-            // Verificăm dacă mesajul conține doar caractere ASCII
+            // verificam daca mesajul contine doar caractere ASCII
             if (!IsAscii(message))
             {
                 await Clients.Caller.SendAsync("ReceiveError", "Mesajul trebuie să conțină doar caractere ASCII.");
@@ -29,10 +29,10 @@ namespace ChatApp.API.Hubs
                 Timestamp = DateTime.UtcNow
             };
 
-            // Salvăm mesajul în baza de date
+            // salvam mesajul in baza de date
             await _chatService.CreateMessageAsync(chatMessage);
 
-            // Transmitem mesajul către toți clienții conectați
+            // transmitem mesajul catre toti clientii conectati
             await Clients.All.SendAsync("ReceiveMessage", chatMessage);
         }
 
@@ -44,7 +44,7 @@ namespace ChatApp.API.Hubs
 
         private bool IsAscii(string text)
         {
-            // Verifică dacă toate caracterele sunt ASCII (coduri 0-127)
+            // verifica daca toate caracterele sunt ASCII (coduri 0-127)
             return text.All(c => c <= 127);
         }
     }

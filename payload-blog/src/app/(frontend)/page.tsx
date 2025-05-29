@@ -159,8 +159,6 @@ export default async function HomePage() {
         <div className="content">
           {/* Header Section */}
           <header className="page-header">
-            <h1>Sisteme Tolerante la Defecte - Demo</h1>
-            <p className="welcome-message">Chat în timp real și procesare OCR cu Kubernetes</p>
           </header>
 
           {/* Blog Post Section */}

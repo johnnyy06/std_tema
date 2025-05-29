@@ -2,19 +2,19 @@ using ChatApp.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurare pentru a asculta pe toate interfețele
+// configurare pentru a asculta pe toate interfetele
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(5000); // Ascultă pe portul 80 pentru toate IP-urile
+    options.ListenAnyIP(5000);
 });
 
-// Adăugare servicii la container
+// adaugare servicii la container
 var startup = new Startup(builder.Configuration);
 startup.ConfigureServices(builder.Services);
 
 var app = builder.Build();
 
-// Configurare pipeline de cereri HTTP
+// configurare pipeline de cereri HTTP
 startup.Configure(app, app.Environment);
 
 Console.WriteLine("Starting ChatApp API...");

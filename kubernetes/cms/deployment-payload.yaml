@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: payload
-          image: johnnyy06/payload:v1.4
+          image: johnnyy06/payload:v1.5
           ports:
             - containerPort: 3003
           env:

@@ -20,7 +20,7 @@ namespace ChatApp.API
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
-            // Enhanced CORS configuration for Kubernetes
+            // CORS configuration for Kubernetes
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", builder =>
@@ -41,7 +41,7 @@ namespace ChatApp.API
                 });
             });
 
-            // Configure database connection string
+            // configure database connection string
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             if (Environment.GetEnvironmentVariable("KUBERNETES_SERVICE_HOST") != null)
             {
@@ -51,7 +51,7 @@ namespace ChatApp.API
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-            // Enhanced SignalR configuration
+            // SignalR configuration
             services.AddSignalR(options =>
             {
                 options.EnableDetailedErrors = true;
